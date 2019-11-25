@@ -26,10 +26,6 @@ public class PlaceholderFragment extends Fragment {
     private PageViewModel pageViewModel;
 
     public static Fragment newInstance(int index) {
-        //PlaceholderFragment fragment = new PlaceholderFragment();
-        //Bundle bundle = new Bundle();
-        //bundle.putInt(ARG_SECTION_NUMBER, index);
-        //fragment.setArguments(bundle);
         Fragment fragment = null;
 
         switch (index) {

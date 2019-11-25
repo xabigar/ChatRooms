@@ -1,12 +1,9 @@
 <resources>
     <string name="app_name">Chat Rooms</string>
-    <string name="tab_text_1">Location</string>
-    <string name="tab_text_2">Chat</string>
-    <string name="tab_text_3">Map</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="chat_fragment">Chat</string>
     <string name="location_fragment">Location</string>
-    <string name="map_fragment">Map</string>
+    <string name="mode_fragment">Mode</string>
 
 </resources>

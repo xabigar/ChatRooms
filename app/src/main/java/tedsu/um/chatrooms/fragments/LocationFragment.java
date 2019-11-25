@@ -9,8 +9,17 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import tedsu.um.chatrooms.MainActivity;
 import tedsu.um.chatrooms.R;
+import tedsu.um.chatrooms.messages.actions.ChatNewMessageAction;
+import tedsu.um.chatrooms.messages.events.LocationChangeEvent;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,14 +30,11 @@ import tedsu.um.chatrooms.R;
  * create an instance of this fragment.
  */
 public class LocationFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private TextView building;
+    private TextView floor;
+    private TextView room;
+    private Button button2;
 
     private OnFragmentInteractionListener mListener;
 
@@ -36,45 +42,57 @@ public class LocationFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment LocationFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static LocationFragment newInstance(String param1, String param2) {
         LocationFragment fragment = new LocationFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_location, container, false);
+        View fragment_view = inflater.inflate(R.layout.fragment_location, container, false);
+        button2 = fragment_view.findViewById(R.id.button2);
+        building = fragment_view.findViewById(R.id.buildingTag);
+        floor = fragment_view.findViewById(R.id.floorTag);
+        room = fragment_view.findViewById(R.id.roomTag);
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity)getActivity()).writeMsgOnChat("Hola", "yo");
+            }
+        });
+
+
+        return fragment_view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+    @Subscribe(threadMode= ThreadMode.MAIN)
+    public void receiveNewLocation (LocationChangeEvent event){
+        //TextView textView = new TextView(getActivity());
+
+        building.setText("Building: "+event.getBuilding());
+        floor.setText("Floor: "+event.getFloor());
+        room.setText("Room: "+event.getRoom());
+    }
+
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
