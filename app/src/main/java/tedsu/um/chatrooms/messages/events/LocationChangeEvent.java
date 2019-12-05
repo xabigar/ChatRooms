@@ -4,11 +4,16 @@ public class LocationChangeEvent {
     String building;
     String floor;
     String room;
+    String s;
+    String r;
 
-    public LocationChangeEvent(String building, String floor, String room) {
+
+    public LocationChangeEvent(String building, String floor, String room, String s, String r) {
         this.building = building;
         this.floor = floor;
         this.room = room;
+        this.s = s;
+        this.r = r;
     }
 
     public String getBuilding() {
@@ -22,4 +27,8 @@ public class LocationChangeEvent {
     public String getRoom() {
         return room;
     }
+
+    public String getS() { return s; }
+
+    public String getR() { return r; }
 }

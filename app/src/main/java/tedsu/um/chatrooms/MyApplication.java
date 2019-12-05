@@ -6,9 +6,8 @@ import android.widget.Toast;
 import es.umu.multilocation.android.helpers.MultilocationHelper;
 
 public class MyApplication extends Application {
-
+    String mode;
     private MultilocationHelper multilocationHelper;
-
     public MultilocationHelper getMultilocationHelper() {
         return multilocationHelper;
     }
@@ -17,4 +16,12 @@ public class MyApplication extends Application {
         this.multilocationHelper = multilocationHelper;
         Toast.makeText(this, "MultilocationHelperSet",Toast.LENGTH_SHORT);
     }
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
 }

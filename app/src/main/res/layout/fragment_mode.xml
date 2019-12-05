@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.ModeFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/mode"
+            android:layout_width="wrap_content"
+            android:layout_height="19dp"
+            android:layout_marginTop="30dp"
+            android:text="@string/mode_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mode">
+
+            <RadioButton
+                android:id="@+id/builidingButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="BUILDING MODE" />
+
+            <RadioButton
+                android:id="@+id/floorButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="FLOOR MODE" />
+
+            <RadioButton
+                android:id="@+id/roomButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ROOM MODE" />
+        </RadioGroup>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

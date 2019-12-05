@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProviders;
 import tedsu.um.chatrooms.R;
 import tedsu.um.chatrooms.fragments.ChatFragment;
 import tedsu.um.chatrooms.fragments.LocationFragment;
-import tedsu.um.chatrooms.fragments.MapFragment;
+import tedsu.um.chatrooms.fragments.ModeFragment;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -31,7 +31,7 @@ public class PlaceholderFragment extends Fragment {
         switch (index) {
             case 1: fragment = new LocationFragment(); break;
             case 2: fragment = new ChatFragment(); break;
-            case 3: fragment = new MapFragment(); break;
+            case 3: fragment = new ModeFragment(); break;
         }
         return fragment;
     }

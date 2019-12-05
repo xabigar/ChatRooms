@@ -2,16 +2,12 @@ package tedsu.um.chatrooms;
 
 import android.net.Uri;
 import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+
 import com.google.android.material.tabs.TabLayout;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,13 +23,14 @@ import es.umu.multilocation.core.managers.data.PositionInfo;
 import es.umu.multilocation.core.technologies.Technology;
 import tedsu.um.chatrooms.fragments.ChatFragment;
 import tedsu.um.chatrooms.fragments.LocationFragment;
-import tedsu.um.chatrooms.fragments.MapFragment;
+import tedsu.um.chatrooms.fragments.ModeFragment;
 import tedsu.um.chatrooms.messages.actions.ChatNewMessageAction;
 import tedsu.um.chatrooms.messages.events.LocationChangeEvent;
 import tedsu.um.chatrooms.ui.main.SectionsPagerAdapter;
 
-public class MainActivity extends AppCompatActivity implements ChatFragment.OnFragmentInteractionListener, LocationFragment.OnFragmentInteractionListener, MapFragment.OnFragmentInteractionListener {
-
+public class MainActivity extends AppCompatActivity implements ChatFragment.OnFragmentInteractionListener, LocationFragment.OnFragmentInteractionListener, ModeFragment.OnFragmentInteractionListener {
+    private String senderRoutingKey;
+    private String receiverRoutingKey;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +46,10 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
         super.onStart();
         EventBus.getDefault().register(this);
         Log.d("mainapp", "Start event");
+        if (((MyApplication) this.getApplication()).getMode() == null) {
+            ((MyApplication) this.getApplication()).setMode("building");
+        }
+
         if (((MyApplication) this.getApplication()).getMultilocationHelper() == null) {
             MultilocationHelper multilocationHelper = null;
             try {
@@ -91,10 +92,10 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
     public void onPositionUpdateEvent(PositionUpdateEvent event) {
         //Toast.makeText(this, "Hi!", Toast.LENGTH_SHORT).show();
         if (!event.positions.isEmpty()) {
-            TextView textView = findViewById(R.id.title);
             PositionInfo position = event.positions.get(0);
-            textView.setText(position.getTag());
             String[] items = getItems(position.getTag());
+            TextView textView = findViewById(R.id.title);
+            textView.setText(position.getTag());
             Log.d("mainapp", position.getTag());
             String building = items[0];
             Log.d("mainapp", building);
@@ -102,6 +103,10 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
             Log.d("mainapp", floor);
             String room = items[2];
             Log.d("mainapp", room);
+
+            senderRoutingKey = position.getTag();
+            String mode = getMode();
+            receiverRoutingKey = getReceiverRoutingKey(building, floor, room, mode);
             printLocation(building,floor, room);
         }
     }
@@ -110,12 +115,38 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
         return cadena.split("\\.");
     }
 
+    public String getReceiverRoutingKey (String building, String floor, String room, String mode) {
+        switch(mode)
+        {
+            case "building":
+                return building + '.' + '*';
+            case "floor":
+                return building + '.' + floor + '.' + '*';
+            case "room":
+                return building + '.' + floor + '.' + room;
+            default:
+                return "hola";
+        }
+    }
+
     public void writeMsgOnChat(String message, String origin){
         EventBus.getDefault().post(new ChatNewMessageAction(message, origin));
     }
 
     public void printLocation (String building, String floor, String room) {
-        EventBus.getDefault().post(new LocationChangeEvent(building, floor, room));
+        EventBus.getDefault().post(new LocationChangeEvent(building, floor, room, senderRoutingKey, receiverRoutingKey));
+    }
+
+    public String getSenderRoutingKey () {
+        return senderRoutingKey;
+    }
+
+    public String getMode () {
+        return ((MyApplication) this.getApplication()).getMode();
+    }
+
+    public void setMode (String mode) {
+        ((MyApplication) this.getApplication()).setMode(mode);
     }
 
     @Override

@@ -34,6 +34,8 @@ public class LocationFragment extends Fragment {
     private TextView building;
     private TextView floor;
     private TextView room;
+    private TextView srk;
+    private TextView rrk;
     private Button button2;
 
     private OnFragmentInteractionListener mListener;
@@ -61,6 +63,8 @@ public class LocationFragment extends Fragment {
         building = fragment_view.findViewById(R.id.buildingTag);
         floor = fragment_view.findViewById(R.id.floorTag);
         room = fragment_view.findViewById(R.id.roomTag);
+        srk = fragment_view.findViewById(R.id.senderRK);
+        rrk = fragment_view.findViewById(R.id.receiverRK);
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,6 +83,8 @@ public class LocationFragment extends Fragment {
         building.setText("Building: "+event.getBuilding());
         floor.setText("Floor: "+event.getFloor());
         room.setText("Room: "+event.getRoom());
+        srk.setText("SRK: "+event.getS());
+        rrk.setText("RRK: "+event.getR());
     }
 
 
@@ -95,22 +101,6 @@ public class LocationFragment extends Fragment {
         EventBus.getDefault().unregister(this);
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
 
     /**
      * This interface must be implemented by activities that contain this
