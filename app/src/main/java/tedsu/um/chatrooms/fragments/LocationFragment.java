@@ -36,8 +36,6 @@ public class LocationFragment extends Fragment {
     private TextView room;
     private TextView srk;
     private TextView rrk;
-    private Button button2;
-
     private OnFragmentInteractionListener mListener;
 
     public LocationFragment() {
@@ -59,19 +57,11 @@ public class LocationFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View fragment_view = inflater.inflate(R.layout.fragment_location, container, false);
-        button2 = fragment_view.findViewById(R.id.button2);
         building = fragment_view.findViewById(R.id.buildingTag);
         floor = fragment_view.findViewById(R.id.floorTag);
         room = fragment_view.findViewById(R.id.roomTag);
         srk = fragment_view.findViewById(R.id.senderRK);
         rrk = fragment_view.findViewById(R.id.receiverRK);
-        button2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((MainActivity)getActivity()).writeMsgOnChat("Hola", "yo");
-            }
-        });
-
 
         return fragment_view;
     }

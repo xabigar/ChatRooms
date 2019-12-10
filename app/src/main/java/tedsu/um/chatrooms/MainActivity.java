@@ -93,21 +93,25 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
         //Toast.makeText(this, "Hi!", Toast.LENGTH_SHORT).show();
         if (!event.positions.isEmpty()) {
             PositionInfo position = event.positions.get(0);
-            String[] items = getItems(position.getTag());
-            TextView textView = findViewById(R.id.title);
-            textView.setText(position.getTag());
-            Log.d("mainapp", position.getTag());
-            String building = items[0];
-            Log.d("mainapp", building);
-            String floor = items[1];
-            Log.d("mainapp", floor);
-            String room = items[2];
-            Log.d("mainapp", room);
+            if  (position.getTag().length() > 0) {
+                String[] items = getItems(position.getTag());
+                if (items.length > 2) {
+                    TextView textView = findViewById(R.id.title);
+                    Log.d("mainapp", position.getTag());
+                    String building = items[0];
+                    Log.d("mainapp", building);
+                    String floor = items[1];
+                    Log.d("mainapp", floor);
+                    String room = items[2];
+                    Log.d("mainapp", room);
 
-            senderRoutingKey = position.getTag();
-            String mode = getMode();
-            receiverRoutingKey = getReceiverRoutingKey(building, floor, room, mode);
-            printLocation(building,floor, room);
+                    senderRoutingKey = building + "." + floor + "." + room;
+                    String mode = getMode();
+                    receiverRoutingKey = generateReceiverRoutingKey(building, floor, room, mode);
+                    textView.setText(receiverRoutingKey);
+                    printLocation(building, floor, room);
+                }
+            }
         }
     }
 
@@ -115,11 +119,11 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
         return cadena.split("\\.");
     }
 
-    public String getReceiverRoutingKey (String building, String floor, String room, String mode) {
+    public String generateReceiverRoutingKey (String building, String floor, String room, String mode) {
         switch(mode)
         {
             case "building":
-                return building + '.' + '*';
+                return building + '.' + '*' + '.' + '*';
             case "floor":
                 return building + '.' + floor + '.' + '*';
             case "room":
@@ -139,6 +143,10 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
 
     public String getSenderRoutingKey () {
         return senderRoutingKey;
+    }
+
+    public String getReceiverRoutingKey () {
+        return receiverRoutingKey;
     }
 
     public String getMode () {
