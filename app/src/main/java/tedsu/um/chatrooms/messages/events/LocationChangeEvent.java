@@ -1,19 +1,20 @@
 package tedsu.um.chatrooms.messages.events;
 
+//Contains the new location and the new routing keys, which are send when the application receives a new location.
 public class LocationChangeEvent {
     String building;
     String floor;
     String room;
-    String s;
-    String r;
+    String senderRoutingKey;
+    String receiveRoutingKey;
 
 
-    public LocationChangeEvent(String building, String floor, String room, String s, String r) {
+    public LocationChangeEvent(String building, String floor, String room, String senderRoutingKey, String receiverRoutingKey) {
         this.building = building;
         this.floor = floor;
         this.room = room;
-        this.s = s;
-        this.r = r;
+        this.senderRoutingKey = senderRoutingKey;
+        this.receiveRoutingKey = receiverRoutingKey;
     }
 
     public String getBuilding() {
@@ -28,7 +29,7 @@ public class LocationChangeEvent {
         return room;
     }
 
-    public String getS() { return s; }
+    public String getS() { return senderRoutingKey; }
 
-    public String getR() { return r; }
+    public String getR() { return receiveRoutingKey; }
 }

@@ -24,7 +24,6 @@ import es.umu.multilocation.core.technologies.Technology;
 import tedsu.um.chatrooms.fragments.ChatFragment;
 import tedsu.um.chatrooms.fragments.LocationFragment;
 import tedsu.um.chatrooms.fragments.ModeFragment;
-import tedsu.um.chatrooms.messages.actions.ChatNewMessageAction;
 import tedsu.um.chatrooms.messages.events.LocationChangeEvent;
 import tedsu.um.chatrooms.ui.main.SectionsPagerAdapter;
 
@@ -131,10 +130,6 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
             default:
                 return "hola";
         }
-    }
-
-    public void writeMsgOnChat(String message, String origin){
-        EventBus.getDefault().post(new ChatNewMessageAction(message, origin));
     }
 
     public void printLocation (String building, String floor, String room) {

@@ -82,7 +82,7 @@ public class ChatFragment extends Fragment {
         lineas = fragment_view.findViewById(R.id.lineas);
         inputText = fragment_view.findViewById(R.id.editText);
         sendButton = fragment_view.findViewById(R.id.sendButton);
-        senderRoutingKey = "informatica.1.dibulibu";
+        senderRoutingKey = "informatica.2.dibulibu";
         receiverRoutingKey = "informatica.*.*";
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,7 +146,7 @@ public class ChatFragment extends Fragment {
 
         senderThread.start();
 
-        /*incomingMessageHandler = new Handler() {
+        incomingMessageHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 String message = msg.getData().getString("msg");
@@ -154,7 +154,7 @@ public class ChatFragment extends Fragment {
                 addLineInScroll("Receive: " + message, routing);
             }
         };
-        subscribe(incomingMessageHandler);*/
+        subscribe(incomingMessageHandler);
 
         return fragment_view;
     }
@@ -164,30 +164,28 @@ public class ChatFragment extends Fragment {
         if (!senderRoutingKey.equals(event.getS())) {
             senderRoutingKey = event.getS();
         }
-        /*if (!receiverRoutingKey.equals(event.getR())) {
+        if (!receiverRoutingKey.equals(event.getR())) {
             String oldReceiverRoutingKey = receiverRoutingKey;
             receiverRoutingKey = event.getR();
             Log.d("receiver", receiverRoutingKey);
-            try {
+           try {
+
                 chReceiver.queueUnbind(queueName, "chatService", oldReceiverRoutingKey);
-                chReceiver.close();
-                chReceiver = connectionReceiver.createChannel();
-                chReceiver.basicQos(1);
-                queueName = chReceiver.queueDeclare().getQueue();
+                //chReceiver.close();
+                //chReceiver = connectionReceiver.createChannel();
+                //chReceiver.basicQos(1);
+                //queueName = chReceiver.queueDeclare().getQueue();
                 chReceiver.queueBind(queueName, "chatService", receiverRoutingKey);
-            }catch(Exception e){
+           }catch(Exception e){
                 e.printStackTrace();
             }
-        }*/
+        }
     }
 
     private void addLineInScroll (String line, String routingKey) {
         TextView newTextView = new TextView(getActivity());
         newTextView.setText("["+routingKey+"] "+line);
         lineas.addView(newTextView);
-
-
-        //scrollView.smoothScrollTo(0, scrollView.getHeight());
 
         scrollView.postDelayed(new Runnable() {
             @Override
@@ -210,7 +208,7 @@ public class ChatFragment extends Fragment {
         }
     }
 
-    /*private void subscribe(final Handler handler)  {
+    private void subscribe(final Handler handler)  {
 
         receiverThread = new Thread(() -> {
 
@@ -240,7 +238,6 @@ public class ChatFragment extends Fragment {
                         handler.sendMessage(msg);
                     }
 
-
                 };
                 String consumerTag = chReceiver.basicConsume(queueName, true, consumer);
                 Log.d("receiver", "Consumer tag: "+consumerTag);
@@ -249,7 +246,7 @@ public class ChatFragment extends Fragment {
             }
         });
         receiverThread.start();
-    }*/
+    }
 
     public static String rightTrim(String str) {
         return str.replaceAll("\\s+$","");
