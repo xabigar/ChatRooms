@@ -1,6 +1,5 @@
 package tedsu.um.chatrooms.fragments;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -15,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import tedsu.um.chatrooms.MainActivity;
-import tedsu.um.chatrooms.MyApplication;
 import tedsu.um.chatrooms.R;
 
 /**
@@ -33,6 +31,7 @@ public class ModeFragment extends Fragment {
     private RadioButton radioButton;
     TextView textView;
     View fragment_view;
+    //One for each mode
     private RadioButton r1;
     private RadioButton r2;
     private RadioButton r3;
@@ -62,6 +61,7 @@ public class ModeFragment extends Fragment {
         r1 = fragment_view.findViewById(R.id.builidingButton);
         r2 = fragment_view.findViewById(R.id.floorButton);
         r3 = fragment_view.findViewById(R.id.roomButton);
+        //When it is initialize, it allows to set checked radio button according to the current mode.
         if (mode == "building") {
             r1.setChecked(true);
         } else {
@@ -78,20 +78,19 @@ public class ModeFragment extends Fragment {
             r3.setChecked(false);
         }
 
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
-        {
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 // checkedId is the RadioButton selected
                 radioButton = fragment_view.findViewById(checkedId);
                 String text = (String)radioButton.getText();
                 String mode = mappingButtonText2ModeString(text);
-                Toast.makeText(getActivity(), mode, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), mode + " mode", Toast.LENGTH_SHORT).show();
                 ((MainActivity)getActivity()).setMode(mode);
             }
         });
         return fragment_view;
     }
-
+    // returns de mode string depending on the radio button that has been pressed
     public String mappingButtonText2ModeString (String text){
         switch(text)
         {

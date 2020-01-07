@@ -29,7 +29,7 @@ public class LocationChangeEvent {
         return room;
     }
 
-    public String getS() { return senderRoutingKey; }
+    public String getSenderRoutingKey() { return senderRoutingKey; }
 
-    public String getR() { return receiveRoutingKey; }
+    public String getReceiverRoutingKey() { return receiveRoutingKey; }
 }

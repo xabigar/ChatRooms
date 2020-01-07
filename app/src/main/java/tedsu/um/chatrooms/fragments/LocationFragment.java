@@ -1,6 +1,5 @@
 package tedsu.um.chatrooms.fragments;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -9,16 +8,13 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import tedsu.um.chatrooms.MainActivity;
 import tedsu.um.chatrooms.R;
-import tedsu.um.chatrooms.messages.actions.ChatNewMessageAction;
 import tedsu.um.chatrooms.messages.events.LocationChangeEvent;
 
 /**
@@ -42,7 +38,7 @@ public class LocationFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static LocationFragment newInstance(String param1, String param2) {
+    public static LocationFragment newInstance() {
         LocationFragment fragment = new LocationFragment();
         return fragment;
     }
@@ -66,15 +62,14 @@ public class LocationFragment extends Fragment {
         return fragment_view;
     }
 
+    //Receives the new positions to be printed in this fragment
     @Subscribe(threadMode= ThreadMode.MAIN)
     public void receiveNewLocation (LocationChangeEvent event){
-        //TextView textView = new TextView(getActivity());
-
         building.setText("Building: "+event.getBuilding());
         floor.setText("Floor: "+event.getFloor());
         room.setText("Room: "+event.getRoom());
-        srk.setText("SRK: "+event.getS());
-        rrk.setText("RRK: "+event.getR());
+        srk.setText("SenderRK: "+event.getSenderRoutingKey());
+        rrk.setText("ReceiverRK: "+event.getReceiverRoutingKey());
     }
 
 

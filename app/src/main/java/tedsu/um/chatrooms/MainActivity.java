@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
 
     public void onStart() {
         super.onStart();
+        // Register to the event bus and initialize the multilocation object
         EventBus.getDefault().register(this);
         Log.d("mainapp", "Start event");
         if (((MyApplication) this.getApplication()).getMode() == null) {
@@ -67,16 +68,12 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
         super.onStop();
     }
 
+    //Enable the requires technologies
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void unTechnologiesInitializationResultEvent (TechnologiesInitializationResultEvent event) {
         Log.d("mainapp", "Multilocation inicializado.");
 
         MultilocationHelper helper = ((MyApplication) this.getApplication()).getMultilocationHelper();
-        helper.enableTechnology(Technology.GPS_TAG);
-        Log.d("mainapp", "Enable GPS.");
-        helper.enableTechnology(Technology.NET_TAG);
-        helper.enableTechnology(Technology.NET_TAG);
-        Log.d("mainapp", "Enable NET.");
         helper.enableTechnology(Technology.WIFI_TAG);
         Log.d("mainapp", "Enable Wifi.");
         helper.enableLearningMode(false);
@@ -87,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
         Toast.makeText(this, "Library initialized!", Toast.LENGTH_SHORT).show();
     }
 
+    //Event which receives the positions, sends an event with the new location and the new routing keys
     @Subscribe (threadMode = ThreadMode.MAIN)
     public void onPositionUpdateEvent(PositionUpdateEvent event) {
         //Toast.makeText(this, "Hi!", Toast.LENGTH_SHORT).show();
@@ -103,21 +101,26 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
                     Log.d("mainapp", floor);
                     String room = items[2];
                     Log.d("mainapp", room);
-
+                    ///To make floor tests:
+                    //building = "informatica";
+                    //floor = "0";
+                    //room = "home";
                     senderRoutingKey = building + "." + floor + "." + room;
                     String mode = getMode();
                     receiverRoutingKey = generateReceiverRoutingKey(building, floor, room, mode);
-                    textView.setText(receiverRoutingKey);
+                    textView.setText(senderRoutingKey +" "+mode.substring(0,1).toUpperCase());
                     printLocation(building, floor, room);
                 }
             }
         }
     }
 
+    // Retrives the position elements and returns them like an array
     public String[] getItems(String cadena) {
         return cadena.split("\\.");
     }
 
+    //Giving the position elements and the mode, returns the retrieve routing key
     public String generateReceiverRoutingKey (String building, String floor, String room, String mode) {
         switch(mode)
         {
@@ -128,10 +131,11 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
             case "room":
                 return building + '.' + floor + '.' + room;
             default:
-                return "hola";
+                return building + '.' + floor + '.' + room;
         }
     }
 
+    // Sends the event with the new location
     public void printLocation (String building, String floor, String room) {
         EventBus.getDefault().post(new LocationChangeEvent(building, floor, room, senderRoutingKey, receiverRoutingKey));
     }

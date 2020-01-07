@@ -27,6 +27,7 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -54,12 +55,9 @@ public class ChatFragment extends Fragment {
     private Channel chSender, chReceiver;
     private String queueName;
 
-
-
     public ChatFragment() {
         // Required empty public constructor
     }
-
 
     public static ChatFragment newInstance(String param1, String param2) {
         ChatFragment fragment = new ChatFragment();
@@ -68,37 +66,37 @@ public class ChatFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View fragment_view = inflater.inflate(R.layout.fragment_chat, container, false);
-
         scrollView = fragment_view.findViewById(R.id.scroll);
         lineas = fragment_view.findViewById(R.id.lineas);
         inputText = fragment_view.findViewById(R.id.editText);
         sendButton = fragment_view.findViewById(R.id.sendButton);
-        senderRoutingKey = "informatica.2.dibulibu";
-        receiverRoutingKey = "informatica.*.*";
+        //Default keys if there not exits any location.
+        senderRoutingKey = "*.*.*";
+        receiverRoutingKey = "*.*.*";
+        //Event when the button is clicked, it sends a message.
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Editable text = inputText.getText();
                 String newText = text.toString();
+                //Remove blank spaces from the right
                 String trim = rightTrim(newText);
+                // Check if the text is not empty
                 if(!trim.isEmpty()) {
-                    addLineInScroll("Send: " + inputText.getText(), senderRoutingKey);
+                    addLineInScroll("Send: " + inputText.getText(), senderRoutingKey, "");
                     sendMessage(inputText.getText().toString());
                     inputText.setText("");
                 }
             }
         });
         queue = new LinkedBlockingDeque<>();
-
         factory = new ConnectionFactory();
         factory.setAutomaticRecoveryEnabled(false);
         try {
@@ -111,8 +109,8 @@ public class ChatFragment extends Fragment {
             Log.d("sender","[excepcion] uri");
         }
 
-        senderThread = new Thread(() -> {
 
+        senderThread = new Thread(() -> {
             while(true) {
                 try {
                     connectionSender = factory.newConnection();
@@ -143,15 +141,16 @@ public class ChatFragment extends Fragment {
                 }
             }
         });
-
         senderThread.start();
 
+        //Event which recives the incoming messages
         incomingMessageHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 String message = msg.getData().getString("msg");
                 String routing = msg.getData().getString("routing");
-                addLineInScroll("Receive: " + message, routing);
+                String time = msg.getData().getString("time");
+                addLineInScroll("Receive: " + message, routing, time);
             }
         };
         subscribe(incomingMessageHandler);
@@ -159,22 +158,21 @@ public class ChatFragment extends Fragment {
         return fragment_view;
     }
 
+    //When the location is changed this method is call and receives the news routingKeys.
     @Subscribe (threadMode=ThreadMode.MAIN)
     public void retriveRoutingKeys (LocationChangeEvent event) throws IOException {
-        if (!senderRoutingKey.equals(event.getS())) {
-            senderRoutingKey = event.getS();
+        //If the new sender routing key is different, the old one is changed
+        if (!senderRoutingKey.equals(event.getSenderRoutingKey())) {
+            senderRoutingKey = event.getSenderRoutingKey();
         }
-        if (!receiverRoutingKey.equals(event.getR())) {
+        //If the new receiver routing key is different, the old one is changed and the binding is modified with the new routingKey
+        if (!receiverRoutingKey.equals(event.getReceiverRoutingKey())) {
             String oldReceiverRoutingKey = receiverRoutingKey;
-            receiverRoutingKey = event.getR();
-            Log.d("receiver", receiverRoutingKey);
+            receiverRoutingKey = event.getReceiverRoutingKey();
            try {
-
+                // The old queue binding is removed
                 chReceiver.queueUnbind(queueName, "chatService", oldReceiverRoutingKey);
-                //chReceiver.close();
-                //chReceiver = connectionReceiver.createChannel();
-                //chReceiver.basicQos(1);
-                //queueName = chReceiver.queueDeclare().getQueue();
+                // Set the new queue binding
                 chReceiver.queueBind(queueName, "chatService", receiverRoutingKey);
            }catch(Exception e){
                 e.printStackTrace();
@@ -182,9 +180,10 @@ public class ChatFragment extends Fragment {
         }
     }
 
-    private void addLineInScroll (String line, String routingKey) {
+    // Prints the messages in the Scroll
+    private void addLineInScroll (String line, String routingKey, String time) {
         TextView newTextView = new TextView(getActivity());
-        newTextView.setText("["+routingKey+"] "+line);
+        newTextView.setText("["+routingKey+" "+ time +"] "+line);
         lineas.addView(newTextView);
 
         scrollView.postDelayed(new Runnable() {
@@ -197,9 +196,10 @@ public class ChatFragment extends Fragment {
 
     }
 
+    // Puts the message in the queue to be published
     public boolean sendMessage(String message){
         try{
-            queue.putLast(message);
+            queue.putLast(getTime()+"."+message);
             // Toast.makeText(getActivity(), senderRoutingKey, Toast.LENGTH_SHORT).show();
             return true;
         }catch(Exception e){
@@ -208,10 +208,9 @@ public class ChatFragment extends Fragment {
         }
     }
 
+    //It creates the connection between the broker and the consumer
     private void subscribe(final Handler handler)  {
-
         receiverThread = new Thread(() -> {
-
             connectionReceiver = null;
             try {
                 connectionReceiver = factory.newConnection();
@@ -232,8 +231,12 @@ public class ChatFragment extends Fragment {
                         Log.d("receiver", "[r] " + message);
                         Message msg = handler.obtainMessage();
                         Bundle bundle = new Bundle();
-                        bundle.putString("msg", message);
+                        int idx = message.indexOf('.');
+                        String time = message.substring(0, idx);
+                        String messagePart = message.substring(idx + 1, message.length());
+                        bundle.putString("msg", messagePart);
                         bundle.putString("routing", routingKey);
+                        bundle.putString("time", time);
                         msg.setData(bundle);
                         handler.sendMessage(msg);
                     }
@@ -248,8 +251,17 @@ public class ChatFragment extends Fragment {
         receiverThread.start();
     }
 
+    // Giving a string removes the blank spaces from the right
     public static String rightTrim(String str) {
         return str.replaceAll("\\s+$","");
+    }
+
+    public static String getTime() {
+        Calendar calendar = Calendar.getInstance();
+        int hour24hrs = calendar.get(Calendar.HOUR_OF_DAY);
+        int minutes = calendar.get(Calendar.MINUTE);
+        int seconds = calendar.get(Calendar.SECOND);
+        return  hour24hrs + ":" + minutes +":"+ seconds;
     }
 
     @Override
